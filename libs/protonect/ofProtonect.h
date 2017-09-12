@@ -26,8 +26,14 @@ class ofProtonect{
         ofProtonect();
     
         int openKinect(std::string serialNo);
-        void updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels);
+        void updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels & depthPixelsUndistorted);
         int closeKinect();
+
+        void setRegistration(bool bUseRegistration=false);
+
+        void getPointXYZRGB(int r, int c, float& x, float& y, float& z, float& rgb) const;
+        //TODO update libfreenect2 to v0.2.0
+        //void getPointXYZ(int r, int c, float& x, float& y, float& z) const;
     
         libfreenect2::Freenect2 & getFreenect2Instance(){
             return freenect2;
@@ -36,6 +42,7 @@ class ofProtonect{
     protected:
   
         bool bOpened;
+        bool bUseRegistration;
         
         libfreenect2::Freenect2 freenect2;
 

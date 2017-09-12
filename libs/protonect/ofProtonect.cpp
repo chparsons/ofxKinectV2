@@ -43,6 +43,7 @@
 
 ofProtonect::ofProtonect(){
     bOpened = false;
+    bUseRegistration = false;
 
     if( ofGetLogLevel() == OF_LOG_VERBOSE ){
         libfreenect2::setGlobalLogger(libfreenect2::createConsoleLogger(libfreenect2::Logger::Debug));
@@ -87,7 +88,7 @@ int ofProtonect::openKinect(string serial){
     return 0;
 }
 
-void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels){
+void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels & depthPixelsUndistorted){
   
     if(bOpened){
         listener->waitForNewFrame(frames);
@@ -95,30 +96,46 @@ void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels
         libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
         libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
 
+        if (bUseRegistration)
+          registration->apply(rgb, depth, undistorted, registered);
+
         rgbPixels.setFromPixels(rgb->data, rgb->width, rgb->height, 3);
         depthPixels.setFromPixels((float *)depth->data, ir->width, ir->height, 1);
+        depthPixelsUndistorted.setFromPixels((float *)undistorted->data, ir->width, ir->height, 1);
 
         listener->release(frames);
     }
 }
 
+void ofProtonect::setRegistration(bool bUseRegistration) {
+  this->bUseRegistration = bUseRegistration;
+};
+
+void ofProtonect::getPointXYZRGB(int r, int c, float& x, float& y, float& z, float& rgb) const {
+  registration->getPointXYZRGB(undistorted, registered, r, c, x, y, z, rgb);
+};
+
+//void ofProtonect::getPointXYZ(int r, int c, float& x, float& y, float& z) const {
+  //registration->getPointXYZ(undistorted, r, c, x, y, z);
+//};
+
 int ofProtonect::closeKinect(){
 
   if(bOpened){
-      listener->release(frames);
+    listener->release(frames);
 
-      // TODO: restarting ir stream doesn't work!
-      // TODO: bad things will happen, if frame listeners are freed before dev->stop() :(
-      dev->stop();
-      dev->close();
-      
-      delete listener;
-      listener = NULL;
-      
-      delete undistorted;
-      undistorted = NULL;
+    // TODO: restarting ir stream doesn't work!
+    // TODO: bad things will happen, if frame listeners are freed before dev->stop() :(
+    dev->stop();
+    dev->close();
 
-      delete registered;
+    delete listener;
+    listener = NULL;
+
+    delete undistorted;
+    undistorted = NULL;
+
+    delete registered;
       registered = NULL;
       
       delete registration;

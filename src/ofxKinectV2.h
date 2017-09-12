@@ -21,6 +21,12 @@ class ofxKinectV2 : public ofThread{
             int freenectId; //don't use this one - this is the index given by freenect2 - but this can change based on order device is plugged in
         };
 
+        struct PointXYZRGB
+        {
+          ofVec3f xyz;
+          ofColor rgb;
+        };
+
         ofxKinectV2();
         ~ofxKinectV2(); 
         
@@ -38,6 +44,15 @@ class ofxKinectV2 : public ofThread{
         ofPixels getDepthPixels();
         ofPixels getRgbPixels();
         ofFloatPixels getRawDepthPixels();
+
+        ofFloatPixels getRawDepthPixelsUndistorted();
+        ofPixels getDepthPixelsUndistorted();
+
+        void setRegistration(bool bUseRegistration);
+
+        PointXYZRGB getPointXYZRGB(int x, int y) const;
+        ofVec3f getWorldCoordinateAt(int x, int y) const;
+        ofColor getColorAt(int x, int y) const;
     
         ofParameterGroup params;
         ofParameter <float> minDistance;
@@ -48,7 +63,9 @@ class ofxKinectV2 : public ofThread{
 
         ofPixels rgbPix;
         ofPixels depthPix;
+        ofPixels depthPixUndistorted;
         ofFloatPixels rawDepthPixels;
+        ofFloatPixels rawDepthPixelsUndistorted;
     
         bool bNewBuffer;
         bool bNewFrame;
@@ -60,5 +77,9 @@ class ofxKinectV2 : public ofThread{
         ofPixels rgbPixelsFront;
         ofFloatPixels depthPixelsBack;
         ofFloatPixels depthPixelsFront;
+        ofFloatPixels depthPixelsUndistortedBack;
+        ofFloatPixels depthPixelsUndistortedFront;
         int lastFrameNo; 
+
+        void updateMappedDepthPixels(const ofFloatPixels& raw, ofPixels& mapped);
 };

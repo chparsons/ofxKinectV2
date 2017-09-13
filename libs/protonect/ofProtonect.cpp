@@ -111,7 +111,7 @@ void ofProtonect::setRegistration(bool bUseRegistration) {
   this->bUseRegistration = bUseRegistration;
 };
 
-void ofProtonect::getPointXYZRGB(int r, int c, float& x, float& y, float& z, float& rgb) const {
+void ofProtonect::getPointXYZRGB(int c, int r, float& x, float& y, float& z, float& rgb) const {
   registration->getPointXYZRGB(undistorted, registered, r, c, x, y, z, rgb);
 };
 

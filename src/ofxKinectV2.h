@@ -47,8 +47,13 @@ class ofxKinectV2 : public ofThread{
 
         ofFloatPixels getRawDepthPixelsUndistorted();
         ofPixels getDepthPixelsUndistorted();
-        ofFloatPixels getRawDepthOnRgbPixels();
-        ofPixels getDepthOnRgbPixels();
+
+        //TODO depth on rgb mapping
+        //registration->apply(..., bigdepth) takes too much cpu
+        //https://github.com/OpenKinect/libfreenect2/issues/337
+        //https://github.com/OpenKinect/libfreenect2/issues/509
+        //ofFloatPixels getRawDepthOnRgbPixels();
+        //ofPixels getDepthOnRgbPixels();
 
         PointXYZRGB getPointXYZRGB(int x, int y) const;
         ofVec3f getWorldCoordinateAt(int x, int y) const;
@@ -84,10 +89,10 @@ class ofxKinectV2 : public ofThread{
         ofFloatPixels depthPixelsUndistortedFront;
         ofPixels depthPixUndistorted;
 
-        ofFloatPixels rawDepthOnRgbPixels;
-        ofFloatPixels depthOnRgbPixelsBack;
-        ofFloatPixels depthOnRgbPixelsFront;
-        ofPixels depthOnRgbPixels;
+        //ofFloatPixels rawDepthOnRgbPixels;
+        //ofFloatPixels depthOnRgbPixelsBack;
+        //ofFloatPixels depthOnRgbPixelsFront;
+        //ofPixels depthOnRgbPixels;
 
         int lastFrameNo; 
 

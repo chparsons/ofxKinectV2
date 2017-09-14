@@ -104,11 +104,13 @@ void ofxKinectV2::threadedFunction(){
 
   while(isThreadRunning()){
 
-    if (bUseRegistration)
-      //protonect.updateKinect(rgbPixelsBack, depthPixelsBack, &depthPixelsUndistortedBack, &depthOnRgbPixelsBack);
+    if (bUseRegistration) {
       protonect.updateKinect(rgbPixelsBack, depthPixelsBack, &depthPixelsUndistortedBack, NULL);
-    else
+      //protonect.updateKinect(rgbPixelsBack, depthPixelsBack, &depthPixelsUndistortedBack, &depthOnRgbPixelsBack);
+    }
+    else {
       protonect.updateKinect(rgbPixelsBack, depthPixelsBack);
+    }
 
     rgbPixelsFront.swap(rgbPixelsBack);
     depthPixelsFront.swap(depthPixelsBack);
@@ -198,13 +200,13 @@ ofPixels ofxKinectV2::getDepthPixelsUndistorted(){
     return depthPixUndistorted;
 }
 
-ofFloatPixels ofxKinectV2::getRawDepthOnRgbPixels(){
-    return rawDepthOnRgbPixels;
-}
+//ofFloatPixels ofxKinectV2::getRawDepthOnRgbPixels(){
+    //return rawDepthOnRgbPixels;
+//}
 
-ofPixels ofxKinectV2::getDepthOnRgbPixels(){
-    return depthOnRgbPixels;
-}
+//ofPixels ofxKinectV2::getDepthOnRgbPixels(){
+    //return depthOnRgbPixels;
+//}
 
 //--------------------------------------------------------------------------------
 ofPixels ofxKinectV2::getRgbPixels(){

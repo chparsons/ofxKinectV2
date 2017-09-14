@@ -81,5 +81,5 @@ class ofxKinectV2 : public ofThread{
         ofFloatPixels depthPixelsUndistortedFront;
         int lastFrameNo; 
 
-        void updateMappedDepthPixels(const ofFloatPixels& raw, ofPixels& mapped);
+        void mapDepthPixels(const ofFloatPixels& raw, ofPixels& mapped);
 };

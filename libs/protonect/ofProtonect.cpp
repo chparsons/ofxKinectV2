@@ -43,7 +43,6 @@
 
 ofProtonect::ofProtonect(){
     bOpened = false;
-    bUseRegistration = false;
 
     if( ofGetLogLevel() == OF_LOG_VERBOSE ){
         libfreenect2::setGlobalLogger(libfreenect2::createConsoleLogger(libfreenect2::Logger::Debug));
@@ -88,28 +87,36 @@ int ofProtonect::openKinect(string serial){
     return 0;
 }
 
-void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels & depthPixelsUndistorted){
+void ofProtonect::updateKinect(ofPixels & rgbPixels, ofFloatPixels & depthPixels, ofFloatPixels* depthPixelsUndistorted, ofFloatPixels* depthOnRgbPixels){
   
+    bool bUseRegistration = depthPixelsUndistorted != NULL || depthOnRgbPixels != NULL;
+
     if(bOpened){
         listener->waitForNewFrame(frames);
         libfreenect2::Frame *rgb = frames[libfreenect2::Frame::Color];
         libfreenect2::Frame *ir = frames[libfreenect2::Frame::Ir];
         libfreenect2::Frame *depth = frames[libfreenect2::Frame::Depth];
 
-        if (bUseRegistration)
-          registration->apply(rgb, depth, undistorted, registered);
-
         rgbPixels.setFromPixels(rgb->data, rgb->width, rgb->height, 3);
         depthPixels.setFromPixels((float *)depth->data, ir->width, ir->height, 1);
-        depthPixelsUndistorted.setFromPixels((float *)undistorted->data, ir->width, ir->height, 1);
+
+        if (bUseRegistration) {
+
+          if (depthOnRgbPixels && !bigFrame)
+            bigFrame = new libfreenect2::Frame(1920, 1082, 4);
+
+          registration->apply(rgb, depth, undistorted, registered, true, bigFrame);
+
+          if (depthPixelsUndistorted)
+            depthPixelsUndistorted->setFromPixels((float *)undistorted->data, undistorted->width, undistorted->height, 1);
+
+          if (depthOnRgbPixels)
+            depthOnRgbPixels->setFromPixels((float *)bigFrame->data, bigFrame->width, bigFrame->height, 1);
+        }
 
         listener->release(frames);
     }
 }
-
-void ofProtonect::setRegistration(bool bUseRegistration) {
-  this->bUseRegistration = bUseRegistration;
-};
 
 void ofProtonect::getPointXYZRGB(int c, int r, float& x, float& y, float& z, float& rgb) const {
   registration->getPointXYZRGB(undistorted, registered, r, c, x, y, z, rgb);
@@ -136,10 +143,13 @@ int ofProtonect::closeKinect(){
     undistorted = NULL;
 
     delete registered;
-      registered = NULL;
-      
-      delete registration;
-      bOpened = false; 
+    registered = NULL;
+
+    delete bigFrame;
+    bigFrame = NULL;
+
+    delete registration;
+    bOpened = false; 
   }
 
   return 0;

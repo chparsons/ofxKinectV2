@@ -47,8 +47,8 @@ class ofxKinectV2 : public ofThread{
 
         ofFloatPixels getRawDepthPixelsUndistorted();
         ofPixels getDepthPixelsUndistorted();
-
-        void setRegistration(bool bUseRegistration);
+        ofFloatPixels getRawDepthOnRgbPixels();
+        ofPixels getDepthOnRgbPixels();
 
         PointXYZRGB getPointXYZRGB(int x, int y) const;
         ofVec3f getWorldCoordinateAt(int x, int y) const;
@@ -58,18 +58,19 @@ class ofxKinectV2 : public ofThread{
         ofParameter <float> minDistance;
         ofParameter <float> maxDistance;
 
+        void setRegistration(bool bUseRegistration);
+
     protected:
         void threadedFunction();
 
         ofPixels rgbPix;
         ofPixels depthPix;
-        ofPixels depthPixUndistorted;
         ofFloatPixels rawDepthPixels;
-        ofFloatPixels rawDepthPixelsUndistorted;
     
         bool bNewBuffer;
         bool bNewFrame;
         bool bOpened;
+        bool bUseRegistration;
     
         ofProtonect protonect; 
     
@@ -77,8 +78,17 @@ class ofxKinectV2 : public ofThread{
         ofPixels rgbPixelsFront;
         ofFloatPixels depthPixelsBack;
         ofFloatPixels depthPixelsFront;
+
+        ofFloatPixels rawDepthPixelsUndistorted;
         ofFloatPixels depthPixelsUndistortedBack;
         ofFloatPixels depthPixelsUndistortedFront;
+        ofPixels depthPixUndistorted;
+
+        ofFloatPixels rawDepthOnRgbPixels;
+        ofFloatPixels depthOnRgbPixelsBack;
+        ofFloatPixels depthOnRgbPixelsFront;
+        ofPixels depthOnRgbPixels;
+
         int lastFrameNo; 
 
         void mapDepthPixels(const ofFloatPixels& raw, ofPixels& mapped);

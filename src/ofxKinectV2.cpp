@@ -13,6 +13,7 @@ ofxKinectV2::ofxKinectV2(){
     bNewFrame  = false;
     bNewBuffer = false;
     bOpened    = false;
+    bUseRegistration = false;
     lastFrameNo = -1;
     
     //set default distance range to 50cm - 600cm
@@ -101,16 +102,26 @@ bool ofxKinectV2::open(string serial){
 //--------------------------------------------------------------------------------
 void ofxKinectV2::threadedFunction(){
 
-    while(isThreadRunning()){
-        protonect.updateKinect(rgbPixelsBack, depthPixelsBack, depthPixelsUndistortedBack);
-        rgbPixelsFront.swap(rgbPixelsBack);
-        depthPixelsFront.swap(depthPixelsBack);
-        depthPixelsUndistortedFront.swap(depthPixelsUndistortedBack);
-                
-        lock();
-        bNewBuffer = true;
-        unlock();
+  while(isThreadRunning()){
+
+    if (bUseRegistration)
+      //protonect.updateKinect(rgbPixelsBack, depthPixelsBack, &depthPixelsUndistortedBack, &depthOnRgbPixelsBack);
+      protonect.updateKinect(rgbPixelsBack, depthPixelsBack, &depthPixelsUndistortedBack, NULL);
+    else
+      protonect.updateKinect(rgbPixelsBack, depthPixelsBack);
+
+    rgbPixelsFront.swap(rgbPixelsBack);
+    depthPixelsFront.swap(depthPixelsBack);
+
+    if (bUseRegistration) {
+      depthPixelsUndistortedFront.swap(depthPixelsUndistortedBack);
+      //depthOnRgbPixelsFront.swap(depthOnRgbPixelsBack);
     }
+
+    lock();
+    bNewBuffer = true;
+    unlock();
+  }
 }
 
 //--------------------------------------------------------------------------------
@@ -124,14 +135,22 @@ void ofxKinectV2::update(){
         lock();
             rgbPix = rgbPixelsFront;
             rawDepthPixels = depthPixelsFront;
-            rawDepthPixelsUndistorted = depthPixelsUndistortedFront;
+
+            if (bUseRegistration) {
+              rawDepthPixelsUndistorted = depthPixelsUndistortedFront;
+              //rawDepthOnRgbPixels = depthOnRgbPixelsFront;
+            }
+
             bNewBuffer = false;
         unlock();
         
         mapDepthPixels(rawDepthPixels, depthPix);
-        mapDepthPixels(rawDepthPixelsUndistorted, depthPixUndistorted);
 
-        
+        if (bUseRegistration) {
+          mapDepthPixels(rawDepthPixelsUndistorted, depthPixUndistorted);
+          //mapDepthPixels(rawDepthOnRgbPixels, depthOnRgbPixels);
+        }
+
         bNewFrame = true; 
     }
 }
@@ -179,16 +198,20 @@ ofPixels ofxKinectV2::getDepthPixelsUndistorted(){
     return depthPixUndistorted;
 }
 
+ofFloatPixels ofxKinectV2::getRawDepthOnRgbPixels(){
+    return rawDepthOnRgbPixels;
+}
+
+ofPixels ofxKinectV2::getDepthOnRgbPixels(){
+    return depthOnRgbPixels;
+}
+
 //--------------------------------------------------------------------------------
 ofPixels ofxKinectV2::getRgbPixels(){
     return rgbPix; 
 }
 
 //--------------------------------------------------------------------------------
-
-void ofxKinectV2::setRegistration(bool bUseRegistration) {
-  protonect.setRegistration(bUseRegistration);
-}
 
 ofxKinectV2::PointXYZRGB ofxKinectV2::getPointXYZRGB(int x, int y) const {
   float _x, _y, _z;
@@ -215,6 +238,10 @@ ofVec3f ofxKinectV2::getWorldCoordinateAt(int x, int y) const {
 ofColor ofxKinectV2::getColorAt(int x, int y) const {
   ofxKinectV2::PointXYZRGB point = getPointXYZRGB(x, y);
   return point.rgb;
+}
+
+void ofxKinectV2::setRegistration(bool bUseRegistration){
+  this->bUseRegistration = bUseRegistration;
 }
 
 //--------------------------------------------------------------------------------

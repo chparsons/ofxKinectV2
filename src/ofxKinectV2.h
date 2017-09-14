@@ -64,6 +64,7 @@ class ofxKinectV2 : public ofThread{
         ofParameter <float> maxDistance;
 
         void setRegistration(bool bUseRegistration);
+        void setMapDepthPixels(bool bMapDepthPixels);
 
     protected:
         void threadedFunction();
@@ -76,6 +77,7 @@ class ofxKinectV2 : public ofThread{
         bool bNewFrame;
         bool bOpened;
         bool bUseRegistration;
+        bool bMapDepthPixels;
     
         ofProtonect protonect; 
     

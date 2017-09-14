@@ -14,6 +14,7 @@ ofxKinectV2::ofxKinectV2(){
     bNewBuffer = false;
     bOpened    = false;
     bUseRegistration = false;
+    bMapDepthPixels = true;
     lastFrameNo = -1;
     
     //set default distance range to 50cm - 600cm
@@ -145,10 +146,11 @@ void ofxKinectV2::update(){
 
             bNewBuffer = false;
         unlock();
-        
-        mapDepthPixels(rawDepthPixels, depthPix);
 
-        if (bUseRegistration) {
+        if (bMapDepthPixels)
+          mapDepthPixels(rawDepthPixels, depthPix);
+
+        if (bUseRegistration && bMapDepthPixels) {
           mapDepthPixels(rawDepthPixelsUndistorted, depthPixUndistorted);
           //mapDepthPixels(rawDepthOnRgbPixels, depthOnRgbPixels);
         }
@@ -244,6 +246,10 @@ ofColor ofxKinectV2::getColorAt(int x, int y) const {
 
 void ofxKinectV2::setRegistration(bool bUseRegistration){
   this->bUseRegistration = bUseRegistration;
+}
+
+void ofxKinectV2::setMapDepthPixels(bool bMapDepthPixels){
+  this->bMapDepthPixels = bMapDepthPixels;
 }
 
 //--------------------------------------------------------------------------------

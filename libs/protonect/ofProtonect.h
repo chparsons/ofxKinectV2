@@ -32,6 +32,7 @@ class ofProtonect{
         void getPointXYZRGB(int r, int c, float& x, float& y, float& z, float& rgb) const;
         //TODO update libfreenect2 to v0.2.0
         //void getPointXYZ(int r, int c, float& x, float& y, float& z) const;
+        void getColorCoordinateAt(int x, int y, float dz, float& cx, float &cy) const; 
     
         libfreenect2::Freenect2 & getFreenect2Instance(){
             return freenect2;

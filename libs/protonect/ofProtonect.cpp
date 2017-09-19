@@ -54,7 +54,7 @@ ofProtonect::ofProtonect(){
 int ofProtonect::openKinect(string serial){
           
 //      pipeline = new libfreenect2::CpuPacketPipeline();
-//        pipeline = new libfreenect2::OpenGLPacketPipeline();
+        //pipeline = new libfreenect2::OpenGLPacketPipeline();
         pipeline = new libfreenect2::OpenCLPacketPipeline();
 
       if(pipeline)
@@ -125,6 +125,10 @@ void ofProtonect::getPointXYZRGB(int c, int r, float& x, float& y, float& z, flo
 //void ofProtonect::getPointXYZ(int r, int c, float& x, float& y, float& z) const {
   //registration->getPointXYZ(undistorted, r, c, x, y, z);
 //};
+
+void ofProtonect::getColorCoordinateAt(int x, int y, float dz, float& cx, float &cy) const {
+  registration->apply(x, y, dz, cx, cy);
+};
 
 int ofProtonect::closeKinect(){
 

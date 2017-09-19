@@ -46,7 +46,7 @@ class ofxKinectV2 : public ofThread{
         ofFloatPixels getRawDepthPixels();
 
         ofFloatPixels getRawDepthPixelsUndistorted();
-        ofPixels getDepthPixelsUndistorted();
+        //ofPixels getDepthPixelsUndistorted();
 
         //TODO depth on rgb mapping
         //registration->apply(..., bigdepth) takes too much cpu
@@ -57,6 +57,7 @@ class ofxKinectV2 : public ofThread{
 
         PointXYZRGB getPointXYZRGB(int x, int y) const;
         ofVec3f getWorldCoordinateAt(int x, int y) const;
+        ofVec2f getColorCoordinateAt(int x, int y) const;
         ofColor getColorAt(int x, int y) const;
     
         ofParameterGroup params;
@@ -89,7 +90,7 @@ class ofxKinectV2 : public ofThread{
         ofFloatPixels rawDepthPixelsUndistorted;
         ofFloatPixels depthPixelsUndistortedBack;
         ofFloatPixels depthPixelsUndistortedFront;
-        ofPixels depthPixUndistorted;
+        //ofPixels depthPixUndistorted;
 
         //ofFloatPixels rawDepthOnRgbPixels;
         //ofFloatPixels depthOnRgbPixelsBack;

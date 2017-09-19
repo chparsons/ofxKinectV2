@@ -106,6 +106,8 @@ void ofxKinectV2::threadedFunction(){
   while(isThreadRunning()){
 
     if (bUseRegistration) {
+      //TODO depth on rgb mapping
+      //bigdepth takes too much cpu
       protonect.updateKinect(rgbPixelsBack, depthPixelsBack, &depthPixelsUndistortedBack, NULL);
       //protonect.updateKinect(rgbPixelsBack, depthPixelsBack, &depthPixelsUndistortedBack, &depthOnRgbPixelsBack);
     }
@@ -150,10 +152,10 @@ void ofxKinectV2::update(){
         if (bMapDepthPixels)
           mapDepthPixels(rawDepthPixels, depthPix);
 
-        if (bUseRegistration && bMapDepthPixels) {
-          mapDepthPixels(rawDepthPixelsUndistorted, depthPixUndistorted);
+        //if (bUseRegistration && bMapDepthPixels) {
+          //mapDepthPixels(rawDepthPixelsUndistorted, depthPixUndistorted);
           //mapDepthPixels(rawDepthOnRgbPixels, depthOnRgbPixels);
-        }
+        //}
 
         bNewFrame = true; 
     }
@@ -198,9 +200,9 @@ ofFloatPixels ofxKinectV2::getRawDepthPixelsUndistorted(){
     return rawDepthPixelsUndistorted;
 }
 
-ofPixels ofxKinectV2::getDepthPixelsUndistorted(){
-    return depthPixUndistorted;
-}
+//ofPixels ofxKinectV2::getDepthPixelsUndistorted(){
+    //return depthPixUndistorted;
+//}
 
 //ofFloatPixels ofxKinectV2::getRawDepthOnRgbPixels(){
     //return rawDepthOnRgbPixels;
@@ -238,6 +240,23 @@ ofVec3f ofxKinectV2::getWorldCoordinateAt(int x, int y) const {
   ofxKinectV2::PointXYZRGB point = getPointXYZRGB(x, y);
   return point.xyz;
 }
+
+ofVec2f ofxKinectV2::getColorCoordinateAt(int x, int y) const { 
+
+  int dw = rawDepthPixels.getWidth();
+  float dz = rawDepthPixels[x + y * dw];
+
+  if ( dz <= 0.0f )
+  {
+    const float nan = numeric_limits<float>::quiet_NaN();
+    return ofVec2f(nan,nan);
+  }
+
+  float cx, cy;
+  protonect.getColorCoordinateAt(x, y, dz, cx, cy);
+
+  return ofVec2f(cx, cy);
+};
 
 ofColor ofxKinectV2::getColorAt(int x, int y) const {
   ofxKinectV2::PointXYZRGB point = getPointXYZRGB(x, y);
